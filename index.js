@@ -1,9 +1,13 @@
+// *** Notas en el readme *** //
+
 const express = require("express");
 const req = require("express/lib/request");
 const logger = require("morgan");
 const app = express();
 
-//Express middlewares - EL ORDEN DE LOS MIDDLEWARES IMPORTA!!
+const routes = require("./route");
+
+//Express middlewares - EL ORDEN DE LOS MIDDLEWARES IMPORTA!! se pueden establecer como parametros de cada ruta (ver ejemplo mas abajo en post "/") y asi encapsularlos, de lo contrario al declararlos de forma global afectaran a todas las rutas.
 // llega el request -> middlerware -> next() -> va a buscar la ruta que le corresponde
 app.use("/", (req, res, next) => {
   console.log("Hicieron un request a " + req.url);
@@ -11,6 +15,9 @@ app.use("/", (req, res, next) => {
 });
 
 app.use(logger("dev"));
+// middleware para que en el post req.body podamos leer el json y se transforme a un objeto
+app.use(express.json());
+app.use("/about", routes);
 
 app.get("/", (req, res) => {
   //status code 200
@@ -54,10 +61,17 @@ app.get("/ab*cd", (req, res) => {
   res.send("abcd con muchas b");
 });
 
-// Publicar un valor en el servidor
-app.post("/", (req, res) => {
+// Publicar un valor en el servidor. No podemos usar el navegador para testear un post. Usamos postman
+// No es obligatorio utilizar toda la info que nos pasen por body
+app.post("/", express.json(), (req, res) => {
   console.log(req.body);
+  let { name, lastName } = req.body;
+  console.log(name, lastName);
   res.send("done");
+});
+
+app.put("/:id", (req, res) => {
+  res.send(req.params.id);
 });
 
 //en caso de no encontrar ninguna ruta, atrapar el error
