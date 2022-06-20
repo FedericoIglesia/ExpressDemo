@@ -17,6 +17,7 @@ app.use("/", (req, res, next) => {
 app.use(logger("dev"));
 // middleware para que en el post req.body podamos leer el json y se transforme a un objeto
 app.use(express.json());
+//toda ruta con "/about" va a buscar a routes, que me importo desde "./route.js". Es una forma de modularizar la info
 app.use("/about", routes);
 
 app.get("/", (req, res) => {
